@@ -1,4 +1,4 @@
-use crate::sheaf::Render;
+use crate::sheaf::Bind;
 use clap::Parser;
 use std::fs;
 use std::io::{self, BufWriter};
@@ -22,8 +22,8 @@ fn main() -> io::Result<()> {
     let output_file = fs::File::create(&args.output)?;
     let mut writer = BufWriter::new(output_file);
 
-    let doc = collector::collect_src_files(&args.target_dir)?;
-    doc.render(&mut writer)?;
+    let doc = binder::collect_src_files(&args.target_dir)?;
+    doc.bind(&mut writer)?;
 
     Ok(())
 }

@@ -2,9 +2,9 @@ use std::{fs, io, path::Path};
 
 use ignore::WalkBuilder;
 
-use crate::document::{Document, MetaData, SrcFile};
+use crate::sheaf::{FrontMatter, Leaf, Sheaf};
 
-pub fn collect_src_files(target_dir: &Path) -> io::Result<Document> {
+pub fn collect_src_files(target_dir: &Path) -> io::Result<Sheaf> {
     let mut file_paths = Vec::new();
     let walker = WalkBuilder::new(target_dir).build();
 
@@ -33,19 +33,19 @@ pub fn collect_src_files(target_dir: &Path) -> io::Result<Document> {
 
     file_paths.sort_by(|a, b| a.0.cmp(&b.0));
 
-    let mut files: Vec<SrcFile> = Vec::new();
+    let mut files: Vec<Leaf> = Vec::new();
 
     for (rel_path, full_path) in &file_paths {
         let ext = full_path
             .extension()
             .and_then(|e| e.to_str())
             .unwrap_or("text");
-        if let Ok(content) = fs::read_to_string(&full_path) {
-            files.push(SrcFile::new(rel_path.clone(), ext.into(), content));
+        if let Ok(content) = fs::read_to_string(full_path) {
+            files.push(Leaf::new(rel_path.clone(), ext.into(), content));
         }
     }
 
     let index = file_paths.into_iter().map(|(a, _)| a).collect();
 
-    Ok(Document::new(MetaData::new(title), index, files))
+    Ok(Sheaf::new(FrontMatter::new(title), index, files))
 }
