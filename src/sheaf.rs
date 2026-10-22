@@ -79,7 +79,7 @@ impl Bind for Sheaf {
                 // Can't impl `Render` for `Index` as its an alias so we render here
                 writeln!(writer, "## Index\n```text")?;
                 for path in register {
-                    writeln!(writer, "{}", path)?;
+                    writeln!(writer, "{path}")?;
                 }
                 writeln!(writer, "```\n")?;
                 writeln!(writer, "## Source Files\n")?;

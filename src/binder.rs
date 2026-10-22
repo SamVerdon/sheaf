@@ -1,10 +1,10 @@
-use std::{fs, io, path::PathBuf};
+use std::{fs, path::PathBuf};
 
 use ignore::WalkBuilder;
 
 use crate::sheaf::{FrontMatter, Leaf, Sheaf};
 
-pub fn collect_leaves(targets: &[PathBuf], include_hidden: bool) -> io::Result<Sheaf> {
+pub fn collect_leaves(targets: &[PathBuf], include_hidden: bool) -> Sheaf {
     let is_project = targets.len() == 1 && targets[0].is_dir();
     let mut file_paths = Vec::new();
     let mut builder = WalkBuilder::new(&targets[0]);
@@ -14,10 +14,7 @@ pub fn collect_leaves(targets: &[PathBuf], include_hidden: bool) -> io::Result<S
     let walker = builder.hidden(!include_hidden).build();
 
     for result in walker {
-        let entry = match result {
-            Ok(e) => e,
-            Err(_) => continue,
-        };
+        let Ok(entry) = result else { continue };
 
         if entry.path().is_file() {
             let rel_path = if is_project {
@@ -55,12 +52,8 @@ pub fn collect_leaves(targets: &[PathBuf], include_hidden: bool) -> io::Result<S
             .to_string_lossy()
             .into_owned();
         let register = file_paths.into_iter().map(|(a, _)| a).collect();
-        Ok(Sheaf::project(
-            FrontMatter::new(title.clone()),
-            register,
-            leaves,
-        ))
+        Sheaf::project(FrontMatter::new(title.clone()), register, leaves)
     } else {
-        Ok(Sheaf::collection(leaves))
+        Sheaf::collection(leaves)
     }
 }
