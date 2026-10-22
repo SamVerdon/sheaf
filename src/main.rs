@@ -11,10 +11,13 @@ mod sheaf;
 #[command(author, version, about = "Flatten codebase for LLMs")]
 struct Args {
     #[arg(default_value = ".")]
-    target_dir: PathBuf,
+    target_dir: Vec<PathBuf>,
 
     #[arg(short, long, default_value = "context.md")]
     output: PathBuf,
+
+    #[arg(short, long)]
+    hidden: bool,
 }
 
 fn main() -> io::Result<()> {
@@ -22,7 +25,7 @@ fn main() -> io::Result<()> {
     let output_file = fs::File::create(&args.output)?;
     let mut writer = BufWriter::new(output_file);
 
-    let doc = binder::collect_src_files(&args.target_dir)?;
+    let doc = binder::collect_leaves(&args.target_dir, args.hidden)?;
     doc.bind(&mut writer)?;
 
     Ok(())
