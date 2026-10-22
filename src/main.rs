@@ -16,7 +16,7 @@ struct Args {
     #[arg(short, long, default_value = "context.md")]
     output: PathBuf,
 
-    #[arg(short, long)]
+    #[arg(long)]
     hidden: bool,
 }
 
